@@ -1,0 +1,26 @@
+{
+  "name": "up-to-grade",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:go": "cd server && go run .",
+    "dev:go:watch": "cd server && $(go env GOPATH)/bin/air",
+    "dev:ready": "wait-on http://localhost:8080/health && node scripts/open-url.mjs http://localhost:5173",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "serve:go": "cd server && go run .",
+    "dev:all": "concurrently -k -n go,vite,ready -c blue,green,yellow \"npm:dev:go:watch\" \"npm:dev\" \"npm:dev:ready\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "open": "^11.0.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "wait-on": "^9.0.3"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0"
+  }
+}

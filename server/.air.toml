@@ -1,0 +1,19 @@
+# Air config for hot-reload
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/main ."
+  entrypoint = "./tmp/main"
+  include_ext = ["go"]
+  exclude_regex = ["_test.go"]
+  delay = 200 # ms
+
+[log]
+  time = true
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
