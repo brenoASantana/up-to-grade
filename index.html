@@ -1,13 +1,68 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>up-to-grade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+    <title>▼ UP TO GRADE ▼</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- Tela inicial de boas-vindas -->
+      <div id="welcome-screen" class="welcome-screen">
+        <!-- Grid animado anos 80 -->
+        <div class="retro-grid"></div>
+        <div class="scanlines"></div>
+        <div class="crt-overlay"></div>
+
+        <div class="welcome-content">
+          <div class="title-container">
+            <div class="pixel-border">
+              <h1 class="pixel-text" data-text="▼ UP-TO-GRADE ▼">
+                ▼ UP-TO-GRADE ▼
+              </h1>
+            </div>
+            <div class="subtitle-container">
+              <p class="typing-text">&gt; PREPARE-SE PARA EVOLUIR_</p>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <div class="input-wrapper">
+              <label for="player-name" class="input-label">
+                &gt; PLAYER NAME:
+              </label>
+              <input
+                type="text"
+                id="player-name"
+                placeholder="DIGITE AQUI"
+                maxlength="16"
+                autofocus
+              />
+            </div>
+            <button id="start-button" class="pixel-button">
+              <span>▶ START GAME ◀</span>
+            </button>
+          </div>
+
+          <div class="hint-text">[ PRESS ENTER ]</div>
+          <div class="retro-decoration">
+            <span class="blink">█</span>
+            <span class="blink-slow">▲</span>
+            <span class="blink">█</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Container do jogo (inicialmente oculto) -->
+      <div id="game-container" style="display: none"></div>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,0 +1,608 @@
+/* ═══════════════════════════════════════════════════════
+   TEMA RETRO 16-BIT ANOS 80
+   ═══════════════════════════════════════════════════════ */
+
+/* Paleta de cores neon anos 80 */
+:root {
+  --neon-pink: #ff10f0;
+  --neon-cyan: #00ffff;
+  --neon-purple: #bd00ff;
+  --neon-yellow: #ffff00;
+  --neon-green: #39ff14;
+  --dark-bg: #0a0a0f;
+  --grid-color: #ff00ff;
+}
+
+body {
+  font-family: "Press Start 2P", cursive;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Grid animado estilo Tron anos 80 */
+.retro-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(
+      0deg,
+      transparent 24%,
+      rgba(255, 0, 255, 0.05) 25%,
+      rgba(255, 0, 255, 0.05) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(255, 0, 255, 0.05) 75%,
+      rgba(255, 0, 255, 0.05) 76%,
+      transparent 77%,
+      transparent
+    ),
+    linear-gradient(
+      90deg,
+      transparent 24%,
+      rgba(255, 0, 255, 0.05) 25%,
+      rgba(255, 0, 255, 0.05) 26%,
+      transparent 27%,
+      transparent 74%,
+      rgba(255, 0, 255, 0.05) 75%,
+      rgba(255, 0, 255, 0.05) 76%,
+      transparent 77%,
+      transparent
+    );
+  background-size: 50px 50px;
+  background-position: center center;
+  perspective: 500px;
+  transform-style: preserve-3d;
+  animation: gridMove 20s linear infinite;
+  z-index: 0;
+}
+
+.retro-grid::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(189, 0, 255, 0.3) 0%,
+    transparent 50%,
+    rgba(0, 255, 255, 0.3) 100%
+  );
+  animation: colorPulse 4s ease-in-out infinite;
+}
+
+@keyframes gridMove {
+  0% {
+    background-position: center center;
+  }
+  100% {
+    background-position: center calc(center + 50px);
+  }
+}
+
+@keyframes colorPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Efeito de scanlines de TV antiga */
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15),
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 999;
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+/* Efeito CRT (tubo de raios catódicos) */
+.crt-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 0%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+  pointer-events: none;
+  z-index: 998;
+}
+
+/* Tela de boas-vindas */
+.welcome-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(180deg, #0a0a0f 0%, #1a0a2e 50%, #0a0a0f 100%);
+  animation: fadeIn 1s ease-in;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 2rem;
+}
+
+.title-container {
+  margin-bottom: 3em;
+  animation: slideDown 1s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Borda pixelada decorativa */
+.pixel-border {
+  position: relative;
+  padding: 1.5rem;
+  background: rgba(10, 10, 15, 0.8);
+  box-shadow:
+    0 0 0 4px var(--neon-cyan),
+    0 0 0 8px var(--dark-bg),
+    0 0 0 12px var(--neon-pink),
+    0 0 40px var(--neon-cyan),
+    inset 0 0 40px rgba(255, 0, 255, 0.2);
+  clip-path: polygon(
+    0 8px,
+    8px 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+}
+
+/* Título pixelado com glitch */
+.pixel-text {
+  font-size: 2.5em;
+  font-weight: 400;
+  margin: 0;
+  color: var(--neon-cyan);
+  text-shadow:
+    3px 3px 0 var(--neon-pink),
+    6px 6px 0 var(--neon-purple),
+    0 0 20px var(--neon-cyan),
+    0 0 40px var(--neon-pink);
+  letter-spacing: 0.1em;
+  animation: glitchText 5s infinite;
+  position: relative;
+}
+
+.pixel-text::before,
+.pixel-text::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.pixel-text::before {
+  color: var(--neon-pink);
+  z-index: -1;
+  animation: glitch1 2s infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+}
+
+.pixel-text::after {
+  color: var(--neon-green);
+  z-index: -2;
+  animation: glitch2 3s infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+}
+
+@keyframes glitchText {
+  0%,
+  90%,
+  100% {
+    transform: translate(0, 0);
+  }
+  92% {
+    transform: translate(-2px, 2px);
+  }
+  94% {
+    transform: translate(2px, -2px);
+  }
+}
+
+@keyframes glitch1 {
+  0%,
+  90%,
+  100% {
+    transform: translate(0, 0);
+  }
+  91% {
+    transform: translate(-4px, 0);
+  }
+  93% {
+    transform: translate(4px, 0);
+  }
+}
+
+@keyframes glitch2 {
+  0%,
+  90%,
+  100% {
+    transform: translate(0, 0);
+  }
+  92% {
+    transform: translate(3px, 0);
+  }
+  94% {
+    transform: translate(-3px, 0);
+  }
+}
+
+/* Subtítulo com efeito de digitação */
+.subtitle-container {
+  margin-top: 1.5em;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 2s steps(30, end);
+  display: inline-block;
+}
+
+.typing-text {
+  font-size: 0.7em;
+  margin: 0;
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green);
+  letter-spacing: 0.05em;
+}
+
+@keyframes typing {
+  from {
+    max-width: 0;
+  }
+  to {
+    max-width: 100%;
+  }
+}
+
+/* Container de input */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  width: 500px;
+  max-width: 90vw;
+  animation: slideUp 1.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.6em;
+  color: var(--neon-yellow);
+  margin-bottom: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  text-shadow: 0 0 10px var(--neon-yellow);
+  animation: blink 1.5s step-end infinite;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 1em;
+  font-size: 1em;
+  font-family: "Press Start 2P", cursive;
+  border: 4px solid var(--neon-cyan);
+  background: rgba(10, 10, 15, 0.9);
+  color: var(--neon-cyan);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  box-shadow:
+    inset 0 0 20px rgba(0, 255, 255, 0.3),
+    0 0 20px var(--neon-cyan);
+  transition: all 0.3s;
+  box-sizing: border-box;
+  clip-path: polygon(
+    0 4px,
+    4px 4px,
+    4px 0,
+    calc(100% - 4px) 0,
+    calc(100% - 4px) 4px,
+    100% 4px,
+    100% calc(100% - 4px),
+    calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 100%,
+    4px 100%,
+    4px calc(100% - 4px),
+    0 calc(100% - 4px)
+  );
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: var(--neon-pink);
+  box-shadow:
+    inset 0 0 30px rgba(255, 0, 255, 0.4),
+    0 0 30px var(--neon-pink);
+  animation: inputPulse 1s infinite;
+}
+
+.input-wrapper input::placeholder {
+  color: rgba(0, 255, 255, 0.3);
+}
+
+@keyframes inputPulse {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 0 30px rgba(255, 0, 255, 0.4),
+      0 0 30px var(--neon-pink);
+  }
+  50% {
+    box-shadow:
+      inset 0 0 40px rgba(255, 0, 255, 0.6),
+      0 0 40px var(--neon-pink);
+  }
+}
+
+/* Botão pixelado */
+.pixel-button {
+  padding: 1em 2em;
+  font-size: 1em;
+  font-family: "Press Start 2P", cursive;
+  background: var(--neon-purple);
+  color: white;
+  border: 4px solid var(--neon-cyan);
+  cursor: pointer;
+  transition: all 0.1s;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  position: relative;
+  box-shadow:
+    0 0 20px var(--neon-purple),
+    inset 0 0 20px rgba(189, 0, 255, 0.5);
+  clip-path: polygon(
+    0 8px,
+    8px 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    calc(100% - 8px) 8px,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    8px calc(100% - 8px),
+    0 calc(100% - 8px)
+  );
+  animation: buttonFloat 2s ease-in-out infinite;
+}
+
+@keyframes buttonFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.pixel-button:hover {
+  background: var(--neon-pink);
+  border-color: var(--neon-yellow);
+  box-shadow:
+    0 0 30px var(--neon-pink),
+    inset 0 0 30px rgba(255, 16, 240, 0.7);
+  transform: scale(1.05);
+}
+
+.pixel-button:active {
+  transform: scale(0.95);
+  box-shadow:
+    0 0 10px var(--neon-pink),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+}
+
+.pixel-button span {
+  position: relative;
+  z-index: 1;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Texto de dica */
+.hint-text {
+  margin-top: 2em;
+  font-size: 0.5em;
+  color: var(--neon-cyan);
+  text-shadow: 0 0 10px var(--neon-cyan);
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Decoração retrô */
+.retro-decoration {
+  margin-top: 3em;
+  font-size: 2em;
+  display: flex;
+  gap: 2em;
+  justify-content: center;
+  color: var(--neon-pink);
+}
+
+.blink {
+  animation: blink 0.8s step-end infinite;
+}
+
+.blink-slow {
+  animation: blink 1.5s step-end infinite;
+  color: var(--neon-yellow);
+}
+
+/* Animação de shake para erro */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s;
+  border-color: #ff0000 !important;
+}
+
+/* Animações de transição */
+.fade-out {
+  animation: pixelFadeOut 0.5s steps(10) forwards;
+}
+
+.fade-in {
+  animation: pixelFadeIn 0.5s steps(10);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pixelFadeOut {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(5px);
+  }
+}
+
+@keyframes pixelFadeIn {
+  0% {
+    opacity: 0;
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .pixel-text {
+    font-size: 1.5em;
+  }
+
+  .typing-text {
+    font-size: 0.5em;
+  }
+
+  .input-container {
+    width: 90%;
+  }
+
+  .pixel-button {
+    font-size: 0.8em;
+  }
+}
+
+@media (max-width: 480px) {
+  .pixel-text {
+    font-size: 1em;
+  }
+
+  .input-label {
+    font-size: 0.5em;
+  }
+}

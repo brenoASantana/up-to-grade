@@ -7,61 +7,91 @@ Projeto Vite + TypeScript + Phaser com backend Go simples.
 - Node.js (recomendado LTS)
 - Go 1.25+
 
-## Desenvolvimento
+## Começando
 
-Abra dois terminais:
-
-1. Backend Go
+### Instalar dependências
 
 ```bash
-npm run dev:go
+make install
 ```
 
-2. Frontend Vite
+## Desenvolvimento
+
+### Modo desenvolvimento completo (recomendado)
+
+Sobe o backend Go com hot-reload + frontend Vite e abre o navegador automaticamente:
 
 ```bash
-npm run dev
+make dev-all
 ```
 
 Acesse: http://localhost:5173
 
-As chamadas para `/api` serão proxyadas para `http://localhost:8080`.
+### Componentes individuais
 
-## Produção (build + servidor Go servindo estáticos)
+Se preferir, suba cada um em um terminal separado:
 
 ```bash
-npm run build
-npm run serve:go
+make dev-go-watch   # Backend Go com hot-reload (Air)
+make dev            # Frontend Vite
 ```
 
-Acesse: http://localhost:8080
+As chamadas para `/api` serão proxyadas para `http://localhost:8080`.
+
+## Build & Produção
+
+### Build do frontend
+
+```bash
+make build
+```
+
+Gera o diretório `dist/` com os arquivos estáticos otimizados.
+
+### Preview do build
+
+```bash
+make preview
+```
+
+### Servir em produção
+
+```bash
+make serve-go
+```
+
+Sobe o backend Go servindo os arquivos estáticos do `dist/`. Acesse: http://localhost:8080
+
+## Utilitários Go
+
+```bash
+make fmt           # Formata código Go
+make vet           # Verifica erros comuns
+make tidy          # Organiza go.mod
+make backend-build # Compila o backend
+```
+
+## Limpeza
+
+```bash
+make clean
+```
+
+Remove os artefatos gerados (`dist/` e `server/tmp/`).
+
+## Ajuda
+
+```bash
+make help
+```
+
+Lista todos os comandos disponíveis.
 
 ## Observações
 
 - O áudio `assets/audio/base_beat.mp3` é opcional. Se ausente, o jogo roda sem som.
 - A função de salvar progresso envia POST para `/api/save` com `{ username, xp, level }`.
 
-## Makefile
-
-- `make dev-all`: sobe Go (hot-reload) + Vite e abre o navegador
-- `make build`: builda o frontend (dist/)
-- `make serve-go`: sobe o backend Go servindo `dist/`
-- `make tidy` / `make vet` / `make fmt`: utilidades Go
-- `make backend-build`: compila o backend
-
-## CI
+## CI/CD
 
 Pipeline em [.github/workflows/ci.yml](.github/workflows/ci.yml) para buildar frontend e backend em PRs e pushes.
-
-## Publicando no GitHub
-
-Criar repositório e enviar (ajuste o nome do seu usuário/remote):
-
-```bash
-git init
-git add -A
-git commit -m "chore: bootstrap up-to-grade"
-git branch -M main
-git remote add origin git@github.com:<seu-usuario>/up-to-grade.git
-git push -u origin main
-```

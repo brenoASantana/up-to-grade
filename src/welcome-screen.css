@@ -1,0 +1,344 @@
+/* Fundo de partículas animadas */
+.particles-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 50%;
+  animation: float-particle linear infinite;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes float-particle {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(calc(var(--drift, 0) * 50px));
+    opacity: 0;
+  }
+}
+
+/* Estilo imersivo da tela de boas-vindas */
+.welcome-screen {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  animation: fadeIn 1s ease-in;
+  z-index: 1;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.title-container {
+  margin-bottom: 3em;
+}
+
+/* Efeito Glitch no título */
+.glitch-text {
+  font-size: 4.5em;
+  font-weight: 900;
+  margin-bottom: 0.3em;
+  background: linear-gradient(45deg, #646cff, #ffd700, #ff6ec7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  background-size: 200% 200%;
+  animation:
+    gradientShift 3s ease infinite,
+    glow 2s ease-in-out infinite;
+  position: relative;
+  text-shadow: 0 0 30px rgba(100, 108, 255, 0.5);
+}
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    filter: brightness(1) drop-shadow(0 0 20px rgba(100, 108, 255, 0.6));
+  }
+  50% {
+    filter: brightness(1.2) drop-shadow(0 0 40px rgba(255, 215, 0, 0.8));
+  }
+}
+
+/* Texto com efeito de digitação */
+.subtitle-container {
+  overflow: hidden;
+  border-right: 2px solid rgba(255, 255, 255, 0.75);
+  white-space: nowrap;
+  margin: 0 auto;
+  animation:
+    typing 3.5s steps(40, end),
+    blink-caret 0.75s step-end infinite;
+  display: inline-block;
+}
+
+.typing-text {
+  font-size: 1.3em;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: rgba(255, 255, 255, 0.75);
+  }
+}
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5em;
+  width: 400px;
+  max-width: 90vw;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.9em;
+  color: rgba(255, 215, 0, 0.9);
+  margin-bottom: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 1.2em;
+  font-size: 1.2em;
+  border: 2px solid #646cff;
+  border-radius: 12px;
+  background: rgba(20, 20, 40, 0.8);
+  color: rgba(255, 255, 255, 0.95);
+  text-align: center;
+  transition: all 0.3s;
+  box-shadow:
+    0 0 20px rgba(100, 108, 255, 0.3),
+    inset 0 0 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  font-weight: 600;
+  letter-spacing: 1px;
+  box-sizing: border-box;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: #ffd700;
+  background: rgba(30, 30, 50, 0.9);
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.6),
+    inset 0 0 20px rgba(0, 0, 0, 0.4);
+  transform: scale(1.02);
+}
+
+.input-wrapper input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Botão com efeito de pulsação */
+.pulse-button {
+  padding: 1.2em 2em;
+  font-size: 1.2em;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.pulse-button::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.6s,
+    height 0.6s;
+}
+
+.pulse-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.pulse-button:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 15px 50px rgba(102, 126, 234, 0.6);
+}
+
+.pulse-button:active {
+  transform: translateY(0) scale(1);
+}
+
+.pulse-button span {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+  }
+  50% {
+    box-shadow: 0 10px 50px rgba(255, 215, 0, 0.6);
+  }
+}
+
+.hint-text {
+  margin-top: 2em;
+  font-size: 0.9em;
+  color: rgba(255, 255, 255, 0.5);
+  animation: fadeInOut 2s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Animação de shake para erro */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-10px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(10px);
+  }
+}
+
+.shake {
+  animation: shake 0.5s;
+  border-color: #ff6b6b !important;
+}
+
+/* Animações de transição */
+.fade-out {
+  animation: fadeOut 0.8s ease-out forwards;
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .glitch-text {
+    font-size: 3em;
+  }
+
+  .typing-text {
+    font-size: 1em;
+  }
+
+  .input-container {
+    width: 90%;
+  }
+}
