@@ -4,57 +4,404 @@ import "./style.css";
 
 let playerName: string = "";
 
+// Tipos de upgrades disponíveis
+interface UpgradeData {
+  name: string;
+  cost: number;
+  level: number;
+  maxLevel: number;
+  description: string;
+}
+
 class GameScene extends Phaser.Scene {
-  private score: number = 0;
-  private level: number = 1;
+  private player!: Phaser.GameObjects.Rectangle;
+  private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  private wasd!: {
+    W: Phaser.Input.Keyboard.Key;
+    A: Phaser.Input.Keyboard.Key;
+    S: Phaser.Input.Keyboard.Key;
+    D: Phaser.Input.Keyboard.Key;
+  };
+  private bullets!: Phaser.Physics.Arcade.Group;
+  private boxes!: Phaser.Physics.Arcade.Group;
+  private coins!: Phaser.Physics.Arcade.Group;
   private bgMusic!: Phaser.Sound.BaseSound;
+
+  // Stats do jogador
+  private money: number = 0;
+  private fireRate: number = 500; // ms entre tiros
+  private damage: number = 1;
+  private coinMultiplier: number = 1;
+  private lastFired: number = 0;
+  private playerSpeed: number = 200;
+
+  // UI
+  private moneyText!: Phaser.GameObjects.Text;
+  private upgradeText!: Phaser.GameObjects.Text;
+  private shopZone!: Phaser.GameObjects.Rectangle;
+  private shopText!: Phaser.GameObjects.Text;
+  private inShop: boolean = false;
+
+  // Upgrades
+  private upgrades: { [key: string]: UpgradeData } = {
+    fireRate: {
+      name: "Cadência de Tiro",
+      cost: 50,
+      level: 0,
+      maxLevel: 10,
+      description: "Atira mais rápido",
+    },
+    damage: {
+      name: "Dano",
+      cost: 100,
+      level: 0,
+      maxLevel: 10,
+      description: "Causa mais dano",
+    },
+    coinValue: {
+      name: "Multiplicador $",
+      cost: 75,
+      level: 0,
+      maxLevel: 10,
+      description: "Mais moedas das caixas",
+    },
+    speed: {
+      name: "Velocidade",
+      cost: 60,
+      level: 0,
+      maxLevel: 5,
+      description: "Move mais rápido",
+    },
+  };
 
   constructor() {
     super("GameScene");
   }
 
   preload() {
-    // Aqui você carregará sua trilha sonora e artes
-    this.load.audio("trilha_base", "assets/audio/base_beat.mp3");
+    // Carrega a música de fundo: 17014 - Svphvr
+    this.load.audio("background_music", "assets/audio/17014-svphvr.mp3");
   }
 
   create() {
-    if (this.cache.audio.exists("trilha_base")) {
-      this.bgMusic = this.sound.add("trilha_base", { loop: true, volume: 0.2 });
+    // Toca a música de fundo em loop: 17014 - Svphvr
+    if (this.cache.audio.exists("background_music")) {
+      this.bgMusic = this.sound.add("background_music", {
+        loop: true,
+        volume: 0.3,
+      });
       this.bgMusic.play();
     }
 
-    // Saudação personalizada
-    this.add.text(100, 50, `Bem-vindo(a), ${playerName}!`, {
-      fontSize: "32px",
+    // Configura física
+    this.physics.world.setBounds(0, 0, 800, 600);
+
+    // Cria o jogador (quadrado verde)
+    this.player = this.add.rectangle(400, 300, 30, 30, 0x00ff00);
+    this.physics.add.existing(this.player);
+    (this.player.body as Phaser.Physics.Arcade.Body).setCollideWorldBounds(
+      true,
+    );
+
+    // Controles WASD
+    this.wasd = this.input.keyboard!.addKeys({
+      W: Phaser.Input.Keyboard.KeyCodes.W,
+      A: Phaser.Input.Keyboard.KeyCodes.A,
+      S: Phaser.Input.Keyboard.KeyCodes.S,
+      D: Phaser.Input.Keyboard.KeyCodes.D,
+    }) as any;
+
+    // Grupos de objetos
+    this.bullets = this.physics.add.group();
+    this.boxes = this.physics.add.group();
+    this.coins = this.physics.add.group();
+
+    // Colisões
+    this.physics.add.overlap(
+      this.bullets,
+      this.boxes,
+      this.hitBox as any,
+      undefined,
+      this,
+    );
+    this.physics.add.overlap(
+      this.player,
+      this.coins,
+      this.collectCoin as any,
+      undefined,
+      this,
+    );
+
+    // UI do dinheiro
+    this.moneyText = this.add.text(16, 16, `💰 $${this.money}`, {
+      fontSize: "24px",
       color: "#FFD700",
+      fontFamily: "Arial",
+      stroke: "#000",
+      strokeThickness: 4,
     });
 
-    const scoreText = this.add.text(100, 100, "Habilidade: 0", {
-      fontSize: "32px",
+    // Zona da loja (canto superior esquerdo)
+    this.shopZone = this.add.rectangle(100, 100, 180, 180, 0x4444ff, 0.3);
+    this.shopText = this.add
+      .text(100, 50, "🏪 LOJA", {
+        fontSize: "20px",
+        color: "#fff",
+        fontFamily: "Arial",
+      })
+      .setOrigin(0.5);
+
+    // Texto de upgrade (inicialmente invisível)
+    this.upgradeText = this.add
+      .text(400, 300, "", {
+        fontSize: "16px",
+        color: "#fff",
+        backgroundColor: "#000",
+        padding: { x: 10, y: 10 },
+        align: "center",
+      })
+      .setOrigin(0.5)
+      .setVisible(false)
+      .setDepth(1000);
+
+    // Tiro com mouse
+    this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      if (!this.inShop) {
+        this.shoot(pointer.x, pointer.y);
+      }
     });
 
-    // Botão de upgrade
+    // Spawna caixas periodicamente
+    this.time.addEvent({
+      delay: 2000,
+      callback: this.spawnBox,
+      callbackScope: this,
+      loop: true,
+    });
+
+    // Informações iniciais
     this.add
-      .text(100, 200, "[ Treinar Habilidade ]", { color: "#0f0" })
-      .setInteractive({ useHandCursor: true })
-      .on("pointerdown", () => {
-        this.score += 10;
-        scoreText.setText(`Habilidade: ${this.score}`);
-        this.checkUpgrade();
-        // Salva progresso no backend (se disponível)
-        saveGameToBackend(this.score, this.level, playerName).catch(() => {});
-      });
+      .text(
+        400,
+        550,
+        `Bem-vindo, ${playerName}! WASD para mover, Mouse para atirar`,
+        {
+          fontSize: "14px",
+          color: "#fff",
+        },
+      )
+      .setOrigin(0.5);
   }
 
-  checkUpgrade() {
-    // Aumenta o volume da música conforme você fica "forte"
-    if (this.score > 100 && this.level === 1) {
-      this.level = 2;
-      if (this.bgMusic) {
-        this.tweens.add({ targets: this.bgMusic, volume: 0.6, duration: 2000 });
+  update(time: number) {
+    // Movimento WASD
+    const body = this.player.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0);
+
+    if (this.wasd.W.isDown) {
+      body.setVelocityY(-this.playerSpeed);
+    } else if (this.wasd.S.isDown) {
+      body.setVelocityY(this.playerSpeed);
+    }
+
+    if (this.wasd.A.isDown) {
+      body.setVelocityX(-this.playerSpeed);
+    } else if (this.wasd.D.isDown) {
+      body.setVelocityX(this.playerSpeed);
+    }
+
+    // Verifica se está na zona da loja
+    const inShopZone = Phaser.Geom.Rectangle.Contains(
+      this.shopZone.getBounds(),
+      this.player.x,
+      this.player.y,
+    );
+
+    if (inShopZone && !this.inShop) {
+      this.enterShop();
+    } else if (!inShopZone && this.inShop) {
+      this.exitShop();
+    }
+  }
+
+  shoot(targetX: number, targetY: number) {
+    const time = this.time.now;
+    if (time - this.lastFired < this.fireRate) return;
+
+    this.lastFired = time;
+
+    // Cria bala
+    const bullet = this.add.rectangle(
+      this.player.x,
+      this.player.y,
+      8,
+      8,
+      0xffff00,
+    );
+    this.bullets.add(bullet);
+    this.physics.add.existing(bullet);
+
+    // Calcula direção
+    const angle = Phaser.Math.Angle.Between(
+      this.player.x,
+      this.player.y,
+      targetX,
+      targetY,
+    );
+
+    const bulletBody = bullet.body as Phaser.Physics.Arcade.Body;
+    bulletBody.setVelocity(Math.cos(angle) * 400, Math.sin(angle) * 400);
+
+    // Remove bala após sair da tela
+    this.time.delayedCall(2000, () => {
+      bullet.destroy();
+    });
+  }
+
+  spawnBox() {
+    const x = Phaser.Math.Between(200, 700);
+    const y = Phaser.Math.Between(100, 500);
+
+    const box = this.add.rectangle(x, y, 40, 40, 0xff6600);
+    box.setStrokeStyle(2, 0x000000);
+    this.boxes.add(box);
+    this.physics.add.existing(box);
+    (box as any).health = this.damage;
+  }
+
+  hitBox(bullet: any, box: any) {
+    bullet.destroy();
+
+    box.health -= this.damage;
+
+    if (box.health <= 0) {
+      // Spawna moedas
+      const numCoins = Phaser.Math.Between(2, 5) * this.coinMultiplier;
+      for (let i = 0; i < numCoins; i++) {
+        const coin = this.add.circle(
+          box.x + Phaser.Math.Between(-20, 20),
+          box.y + Phaser.Math.Between(-20, 20),
+          8,
+          0xffd700,
+        );
+        this.coins.add(coin);
+        this.physics.add.existing(coin);
+
+        // Moeda cai com gravidade
+        const coinBody = coin.body as Phaser.Physics.Arcade.Body;
+        coinBody.setVelocity(
+          Phaser.Math.Between(-50, 50),
+          Phaser.Math.Between(-100, -50),
+        );
+        coinBody.setGravityY(300);
+        coinBody.setBounce(0.5);
+        coinBody.setCollideWorldBounds(true);
+
+        // Remove moeda após 5 segundos
+        this.time.delayedCall(5000, () => {
+          if (coin.active) coin.destroy();
+        });
       }
-      console.log("Sua percepção musical aumentou!");
+
+      box.destroy();
+    }
+  }
+
+  collectCoin(player: any, coin: any) {
+    coin.destroy();
+    this.money += 10;
+    this.moneyText.setText(`💰 $${this.money}`);
+
+    // Som de coleta
+    play8BitSound(1000, 0.1);
+  }
+
+  enterShop() {
+    this.inShop = true;
+    this.showUpgradeMenu();
+  }
+
+  exitShop() {
+    this.inShop = false;
+    this.upgradeText.setVisible(false);
+  }
+
+  showUpgradeMenu() {
+    let menuText = "=== LOJA ===\n\n";
+    let index = 1;
+
+    for (const key in this.upgrades) {
+      const upgrade = this.upgrades[key];
+      const canAfford = this.money >= upgrade.cost;
+      const isMaxed = upgrade.level >= upgrade.maxLevel;
+
+      menuText += `${index}. ${upgrade.name} [Nv${upgrade.level}/${upgrade.maxLevel}]\n`;
+      menuText += `   ${upgrade.description}\n`;
+      menuText += `   Custo: $${upgrade.cost} ${isMaxed ? "(MAX)" : canAfford ? "✓" : "✗"}\n\n`;
+      index++;
+    }
+
+    menuText += "Pressione 1-4 para comprar\nSaia da área para fechar";
+
+    this.upgradeText.setText(menuText);
+    this.upgradeText.setVisible(true);
+    this.upgradeText.setPosition(400, 300);
+
+    // Configura teclas de compra
+    this.setupUpgradeKeys();
+  }
+
+  setupUpgradeKeys() {
+    const keys = ["ONE", "TWO", "THREE", "FOUR"];
+    const upgradeKeys = Object.keys(this.upgrades);
+
+    keys.forEach((key, index) => {
+      const keyboard = this.input.keyboard!.addKey(key);
+      keyboard.once("down", () => {
+        if (this.inShop && upgradeKeys[index]) {
+          this.buyUpgrade(upgradeKeys[index]);
+        }
+      });
+    });
+  }
+
+  buyUpgrade(upgradeKey: string) {
+    const upgrade = this.upgrades[upgradeKey];
+
+    if (upgrade.level >= upgrade.maxLevel) {
+      play8BitSound(200, 0.2); // Som de erro
+      return;
+    }
+
+    if (this.money >= upgrade.cost) {
+      this.money -= upgrade.cost;
+      upgrade.level++;
+      upgrade.cost = Math.floor(upgrade.cost * 1.5);
+
+      // Aplica efeito do upgrade
+      switch (upgradeKey) {
+        case "fireRate":
+          this.fireRate = Math.max(100, this.fireRate - 50);
+          break;
+        case "damage":
+          this.damage++;
+          break;
+        case "coinValue":
+          this.coinMultiplier++;
+          break;
+        case "speed":
+          this.playerSpeed += 30;
+          break;
+      }
+
+      this.moneyText.setText(`💰 $${this.money}`);
+      this.showUpgradeMenu(); // Atualiza menu
+
+      // Som de compra
+      play8BitSound(800, 0.2);
+    } else {
+      // Som de erro
+      play8BitSound(200, 0.2);
     }
   }
 }
@@ -65,6 +412,14 @@ const config = {
   height: 600,
   scene: GameScene,
   parent: "game-container",
+  physics: {
+    default: "arcade",
+    arcade: {
+      gravity: { y: 0, x: 0 },
+      debug: false,
+    },
+  },
+  backgroundColor: "#1a1a2e",
 };
 
 // Função para iniciar o jogo
