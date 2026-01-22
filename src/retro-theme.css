@@ -495,12 +495,14 @@ body {
 
 /* Decoração retrô */
 .retro-decoration {
-  margin-top: 3em;
-  font-size: 2em;
+  margin-top: 2em;
+  font-size: 1.2em;
   display: flex;
-  gap: 2em;
+  gap: 1.5em;
   justify-content: center;
+  align-items: center;
   color: var(--neon-pink);
+  height: 30px;
 }
 
 .blink {
